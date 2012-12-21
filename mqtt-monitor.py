@@ -72,7 +72,7 @@ def on_message(self, obj, msg):
 		topic = msg.topic.split("/")
 		if (( topic[1] == "clients" ) and ( topic[3] == "ping") and ( msg.payload == "response" )):		
 			response[topic[2]] = True
-			print topic[2]
+			print "reponse from ", topic[2]
 
 
 def do_monitor_loop():
