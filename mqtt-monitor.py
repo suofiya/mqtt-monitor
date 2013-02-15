@@ -13,7 +13,7 @@ __copyright__ = "Copyright (C) Dennis Sell"
 
 
 APPNAME = "mqtt-monitor"
-VERSION = "0.8"
+VERSION = "0.10"
 WATCHTOPIC = "/raw/" + APPNAME + "/command"
 
 import os
@@ -34,12 +34,12 @@ class MyMQTTClientCore(MQTTClientCore):
         self.monitorlist = self.cfg.MONITOR_LIST
         self.interval = self.cfg.INTERVAL
         self.clientversion = VERSION
-        t = threading.Thread(target=self.do_thread_loop)
-        t.start()
         self.response = {}
         for i in self.monitorlist:
-            self.response[i] = False 
+            self.response[i] = False
 
+        self.t = threading.Thread(target=self.do_thread_loop)
+        self.t.start() 
 
     def on_connect(self, mself, obj, rc):
         MQTTClientCore.on_connect(self, mself, obj, rc)
@@ -57,7 +57,7 @@ class MyMQTTClientCore(MQTTClientCore):
                 print "reponse from ", topic[2]
 
     def do_thread_loop(self):
-        while ( self.running ):
+        if ( self.running ):
             if ( self.mqtt_connected ):    
                 for client in self.monitorlist:
                     self.response[client] = False
@@ -70,10 +70,8 @@ class MyMQTTClientCore(MQTTClientCore):
                         print "No reponse from ", client
                         self.mqttc.publish( "/raw/mqtt-monitor/status", "Client " + client + " is no longer responding.", qos=2, retain=True )
                 if ( self.interval ):
-                    print "Waiting ", self.interval, " minutes for next check."
-                    time.sleep(60 * self.interval)
-                else:
-                    self.running = False    #do a single shot
+                    print "Waiting ", self.interval, " minutes for next update."
+                    time.sleep(self.interval*60)
             pass
 
 
