@@ -64,7 +64,7 @@ class MyMQTTClientCore(MQTTClientCore):
                     print "Pinging ", client
                     self.mqttc.publish( "/clients/" + client + "/ping", "request", qos=0, retain=0 )
                 time.sleep(10)
-		self.mqttc.publish("/raw/mqtt-monitor/status", "", qos=2, retain=True)
+                self.mqttc.publish("/raw/mqtt-monitor/status", "", qos=2, retain=True)
                 for client in self.monitorlist:
                     if self.response[client] == False:
                         print "No reponse from ", client
